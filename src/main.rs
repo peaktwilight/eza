@@ -307,15 +307,15 @@ impl Exa<'_> {
                 Err(e) => {
                     if e.kind() == ErrorKind::PermissionDenied {
                         eprintln!(
-                            "Permission denied: {} - code: {}",
-                            dir.path.display(),
+                            "Permission denied: {:?} - code: {}",
+                            dir.path,
                             exits::PERMISSION_DENIED
                         );
                         denied_dirs.push(dir.path);
                         continue;
                     }
 
-                    eprintln!("{}: {}", dir.path.display(), e);
+                    eprintln!("{:?}: {}", dir.path, e);
                     continue;
                 }
             };
