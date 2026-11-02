@@ -284,7 +284,7 @@ impl Exa<'_> {
         self.options.filter.filter_argument_files(&mut files);
         self.print_files(None, files)?;
 
-        self.print_dirs(dirs, no_files, is_only_dir, exit_status)
+        self.print_dirs(dirs, no_files, is_only_dir, exit_status, Vec::new())
     }
 
     fn print_dirs(
@@ -293,6 +293,7 @@ impl Exa<'_> {
         mut first: bool,
         is_only_dir: bool,
         exit_status: i32,
+        ancestors: Vec<PathBuf>,
     ) -> io::Result<i32> {
         let View {
             file_style: file_name::Options { quote_style, .. },
@@ -302,6 +303,14 @@ impl Exa<'_> {
         let mut denied_dirs = vec![];
 
         for mut dir in dir_files {
+            let mut child_ancestors = ancestors.clone();
+            if let Ok(canonical_path) = dir.path.canonicalize() {
+                if child_ancestors.contains(&canonical_path) {
+                    continue;
+                }
+                child_ancestors.push(canonical_path);
+            }
+
             let dir = match dir.read() {
                 Ok(dir) => dir,
                 Err(e) => {
@@ -379,7 +388,7 @@ impl Exa<'_> {
                         .collect::<Vec<Dir>>();
 
                     self.print_files(Some(dir), children)?;
-                    match self.print_dirs(child_dirs, false, false, exit_status) {
+                    match self.print_dirs(child_dirs, false, false, exit_status, child_ancestors) {
                         Ok(_) => (),
                         Err(e) => return Err(e),
                     }
