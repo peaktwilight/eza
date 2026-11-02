@@ -45,7 +45,7 @@ pub fn escape(
     }
 }
 
-const HYPERLINK_ESCAPE_CHARS: &AsciiSet = &CONTROLS.add(b' ');
+const HYPERLINK_ESCAPE_CHARS: &AsciiSet = &CONTROLS.add(b' ').add(b'%').add(b'#').add(b'?');
 const HYPERLINK_OPENING_START: &str = "\x1B]8;;";
 const HYPERLINK_OPENING_END: &str = "\x1B\x5C";
 // Combination of both above tags
